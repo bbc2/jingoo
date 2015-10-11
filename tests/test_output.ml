@@ -122,6 +122,11 @@ let test_with test_ctxt =
 ;;
 
 let test_defined test_ctxt =
+  assert_interp ~models:[("null", Tnull)] ~test_ctxt "{{ null is defined }}" "true";
+  assert_interp ~test_ctxt "{{ 0 is defined }}" "true";
+  assert_interp ~test_ctxt "{% set var = 'value' %}{{ var is defined }}" "true";
+  assert_interp ~test_ctxt "{{ missing is defined }}" "false";
+
   assert_interp ~test_ctxt
     "{% set obj = {age:10, name:'taro'} %}\
      {{ obj.age is defined }}"

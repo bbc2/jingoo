@@ -150,6 +150,10 @@ let jg_funp = function
   | Tfun _ -> Tbool true
   | _ -> Tbool false
 
+let jg_nullp = function
+  | Tnull -> Tbool true
+  | _ -> Tbool false
+
 let jg_push_frame ctx =
   {ctx with frame_stack = (Hashtbl.create 10) :: ctx.frame_stack}
 
@@ -318,26 +322,6 @@ let jg_eval_macro ?(caller=false) env ctx macro_name args kwargs macro f =
       ) ctx defaults in
       let ctx = f ctx code in
       jg_pop_frame ctx
-
-let jg_test_defined ctx name =
-  match jg_get_value ctx name with
-    | Tnull -> Tbool(false)
-    | _ -> Tbool(true)
-
-let jg_test_undefined ctx name =
-  match jg_test_defined ctx name with
-    | Tbool status -> Tbool (not status)
-    | _ -> failwith "invalid test:jg_test_defined"
-
-let jg_test_obj_defined ctx obj_name prop_name =
-  match jg_get_value ctx obj_name with
-    | Tobj(alist) -> Tbool (List.mem_assoc prop_name alist)
-    | _ -> Tbool(false)
-
-let jg_test_obj_undefined ctx obj_name prop_name =
-  match jg_test_obj_defined ctx obj_name prop_name with
-    | Tbool status -> Tbool (not status)
-    | _ -> failwith "invalid test:jg_test_obj_defined"
 
 let jg_test_escaped ctx = 
   Tbool(List.mem "safe" @@ ctx.active_filters)
